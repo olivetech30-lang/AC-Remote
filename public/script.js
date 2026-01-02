@@ -3,7 +3,7 @@
 // ============================================
 
 // YOUR VERCEL API URL
-const API_URL = 'https://ac-remote-flame.vercel.app/api';
+const API_URL = 'https://ac-remote-controller.vercel.app/api';
 
 // State management
 let currentTemp = parseInt(localStorage.getItem('currentTemp')) || 24;
