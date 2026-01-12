@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "Esp32new",
+			"path": "Esp32new"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "ACremote"
+	}
+}
