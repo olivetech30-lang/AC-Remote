@@ -1,42 +1,108 @@
 // ============================================
-// AC REMOTE - CONNECTED VIA VERCEL
+// MQTT CONFIGURATION - REPLACE WITH YOUR DETAILS
 // ============================================
+const MQTT_BROKER = 'wss://80d05987fa4647e5977ef063b3937df0.s1.eu.hivemq.cloud:8884/mqtt';
+const MQTT_OPTIONS = {
+    username: 'vercel',
+    password: 'Olive123',
+    clientId: 'web_ac_remote_' + Math.random().toString(36).substr(2, 8),
+    keepalive: 30,
+    reconnectPeriod: 3000
+};
 
-// YOUR VERCEL API URL
-const API_URL = 'https://ac-remote-controller.vercel.app/api';
+const CMD_TOPIC = 'ac/esp32/cmd';
+const STATUS_TOPIC = 'ac/esp32/status';
 
-// State management
+// State
 let currentTemp = parseInt(localStorage.getItem('currentTemp')) || 24;
 let isPowerOn = localStorage.getItem('isPowerOn') === 'true';
+let mqttClient;
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    updateDisplay();
-    updatePowerButton();
-    checkStatus();
-    setInterval(checkStatus, 10000); // Check every 10 seconds
-});
-
-// Power Toggle
-async function togglePower() {
-    const command = isPowerOn ? 'off' : 'on';
-    
+// Load MQTT library and initialize
+async function initApp() {
     try {
-        const response = await fetch(`${API_URL}/power?state=${command}`);
-        const data = await response.json();
+        const { default: mqtt } = await import('https://unpkg.com/mqtt@5.0.0/dist/mqtt.min.js');
+        
+        mqttClient = mqtt.connect(MQTT_BROKER, MQTT_OPTIONS);
 
-        if (data.status === 'success') {
-            isPowerOn = !isPowerOn;
-            localStorage.setItem('isPowerOn', isPowerOn);
-            updatePowerButton();
-            showToast(`✅ Power ${isPowerOn ? 'ON' : 'OFF'}`, 'success');
-        } else {
-            showToast('⚠️ Command not learned yet!', 'warning');
-        }
+        mqttClient.on('connect', () => {
+            console.log('✅ MQTT Connected!');
+            document.getElementById('status').textContent = '🟢 Online (MQTT)';
+            document.getElementById('status').classList.add('online');
+            mqttClient.subscribe(STATUS_TOPIC);
+        });
+
+        mqttClient.on('error', (err) => {
+            console.error('❌ MQTT Error:', err);
+            showToast('❌ MQTT Connection Failed', 'error');
+            document.getElementById('status').textContent = '🔴 MQTT Offline';
+            document.getElementById('status').classList.remove('online');
+        });
+
+        mqttClient.on('message', (topic, message) => {
+            if (topic === STATUS_TOPIC) {
+                try {
+                    const data = JSON.parse(message.toString());
+                    if (data.status === 'executed') {
+                        showToast(`✅ ${data.command}`, 'success');
+                    }
+                } catch (e) {
+                    console.log('Raw status:', message.toString());
+                }
+            }
+        });
+
+        // Initialize UI
+        loadSettings();
+        updateDisplay();
     } catch (error) {
-        showToast('❌ Connection failed', 'error');
-        console.error('Error:', error);
+        console.error('Failed to load MQTT library:', error);
+        showToast('❌ Failed to load MQTT', 'error');
     }
+}
+
+// Initialize on DOM load
+document.addEventListener('DOMContentLoaded', initApp);
+
+// ======================
+// CONTROL FUNCTIONS
+// ======================
+
+function togglePower() {
+    const command = isPowerOn ? 'POWER_OFF' : 'POWER_ON';
+    sendMQTTCommand(command);
+    isPowerOn = !isPowerOn;
+    localStorage.setItem('isPowerOn', isPowerOn);
+    updatePowerButton();
+}
+
+function increaseTemp() {
+    if (currentTemp < 30) {
+        currentTemp++;
+        updateDisplay();
+        sendMQTTCommand(`TEMP_${currentTemp}`);
+    } else {
+        showToast('⚠️ Max 30°C', 'warning');
+    }
+}
+
+function decreaseTemp() {
+    if (currentTemp > 16) {
+        currentTemp--;
+        updateDisplay();
+        sendMQTTCommand(`TEMP_${currentTemp}`);
+    } else {
+        showToast('⚠️ Min 16°C', 'warning');
+    }
+}
+
+function sendMQTTCommand(command) {
+    if (!mqttClient || !mqttClient.connected) {
+        showToast('❌ MQTT Not Connected', 'error');
+        return;
+    }
+    mqttClient.publish(CMD_TOPIC, command);
+    console.log('📤 Sent:', command);
 }
 
 function updatePowerButton() {
@@ -52,104 +118,33 @@ function updatePowerButton() {
     }
 }
 
-// Temperature Controls
-async function increaseTemp() {
-    if (currentTemp < 30) {
-        currentTemp++;
-        updateDisplay();
-        await sendTemp();
-    } else {
-        showToast('⚠️ Max 30°C', 'warning');
-    }
-}
-
-async function decreaseTemp() {
-    if (currentTemp > 16) {
-        currentTemp--;
-        updateDisplay();
-        await sendTemp();
-    } else {
-        showToast('⚠️ Min 16°C', 'warning');
-    }
-}
-
-async function sendTemp() {
-    try {
-        const response = await fetch(`${API_URL}/temp?temp=${currentTemp}`);
-        const data = await response.json();
-
-        if (data.status === 'success') {
-            showToast(`✅ ${currentTemp}°C`, 'success');
-        } else {
-            showToast(`⚠️ Temp ${currentTemp}°C not learned!`, 'warning');
-        }
-    } catch (error) {
-        showToast('❌ Connection failed', 'error');
-        console.error('Error:', error);
-    }
-}
-
 function updateDisplay() {
     document.getElementById('tempValue').textContent = currentTemp;
     localStorage.setItem('currentTemp', currentTemp);
 }
 
-// Learning Mode
+// ======================
+// LEARNING MODE
+// ======================
 function toggleLearning() {
     const panel = document.getElementById('learningPanel');
     const btn = document.getElementById('learningBtn');
-    
     panel.classList.toggle('active');
     btn.classList.toggle('active');
 }
 
-async function startLearning() {
-    const command = document.getElementById('learnCommand').value;
-    const status = document.getElementById('learnStatus');
-    
-    if (!command) {
-        showToast('⚠️ Select a command first', 'warning');
-        return;
-    }
-
-    status.classList.add('active');
-    status.textContent = `📡 Learning ${command}... Press AC remote button NOW!`;
-
-    try {
-        const response = await fetch(`${API_URL}/learn?cmd=${command}`);
-        const data = await response.json();
-
-        if (data.status === 'learning') {
-            showToast(`📡 Learning ${command}...`, 'warning');
-            
-            setTimeout(() => {
-                status.textContent = `✅ ${command} learned!`;
-                setTimeout(() => {
-                    status.classList.remove('active');
-                }, 2000);
-            }, 3000);
-        }
-    } catch (error) {
-        status.textContent = '❌ Learning failed';
-        showToast('❌ Connection failed', 'error');
-        console.error('Error:', error);
-    }
+function startLearning() {
+    showToast('⚠️ Learning must be triggered locally on ESP32', 'warning');
 }
 
-// Status Check
-async function checkStatus() {
-    try {
-        const response = await fetch(`${API_URL}/status`);
-        const data = await response.json();
-        document.getElementById('status').textContent = `🟢 Online`;
-        document.getElementById('status').classList.add('online');
-    } catch (error) {
-        document.getElementById('status').textContent = '🔴 Offline';
-        document.getElementById('status').classList.remove('online');
-    }
+// ======================
+// UTILITIES
+// ======================
+function loadSettings() {
+    document.getElementById('tempValue').textContent = currentTemp;
+    updatePowerButton();
 }
 
-// Toast Notifications
 function showToast(message, type) {
     const toast = document.getElementById('toast');
     toast.textContent = message;
@@ -169,4 +164,9 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
         togglePower();
     }
+});
+
+// Cleanup on unload
+window.addEventListener('beforeunload', () => {
+    if (mqttClient) mqttClient.end();
 });

@@ -23,108 +23,15 @@ body {
     width: 100%;
 }
 
-/* Header - NEW */
-.header {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.header h1 {
-    color: #fff;
-    font-size: 1.5rem;
-    margin-bottom: 5px;
-}
-
-.header p {
-    color: #888;
-    font-size: 0.85rem;
-}
-
 .status {
     text-align: center;
     color: #888;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     font-size: 0.9rem;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
 }
 
 .status.online {
     color: #4CAF50;
-}
-
-/* Setup Section - NEW */
-.setup-section {
-    background: rgba(255, 152, 0, 0.1);
-    border: 2px solid rgba(255, 152, 0, 0.3);
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-.setup-section h3 {
-    color: #ff9800;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-.setup-section label {
-    display: block;
-    color: #aaa;
-    font-size: 0.85rem;
-    margin-bottom: 5px;
-}
-
-.setup-section input {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    border: none;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    font-size: 0.95rem;
-}
-
-.setup-section input::placeholder {
-    color: #666;
-}
-
-.setup-section button {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 10px;
-    background: #ff9800;
-    color: white;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.setup-section button:hover {
-    background: #f57c00;
-    transform: translateY(-2px);
-}
-
-.setup-section small {
-    display: block;
-    margin-top: 10px;
-    color: #666;
-    font-size: 0.75rem;
-    text-align: center;
-}
-
-/* Control Section - NEW */
-.control-section {
-    display: none;
-}
-
-.control-section.active {
-    display: block;
 }
 
 /* Power Button */
@@ -243,7 +150,7 @@ body {
     border: 2px solid rgba(255, 152, 0, 0.3);
     border-radius: 15px;
     padding: 20px;
-    margin-bottom: 15px;
+    margin-top: 15px;
 }
 
 .learning-panel.active {
@@ -259,11 +166,6 @@ body {
     background: rgba(255, 255, 255, 0.1);
     color: white;
     font-size: 1rem;
-}
-
-.learning-panel select option {
-    background: #1e1e2e;
-    color: white;
 }
 
 .learning-panel button {
@@ -297,29 +199,6 @@ body {
 
 .learn-status.active {
     display: block;
-}
-
-/* Settings Button - NEW */
-.settings-btn {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    color: #888;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.settings-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-}
-
-/* Remove old settings section */
-.settings {
-    display: none;
 }
 
 /* Toast */
@@ -364,7 +243,6 @@ body {
     }
 }
 
-/* Responsive Design */
 @media (max-width: 480px) {
     .remote {
         padding: 30px 20px;
