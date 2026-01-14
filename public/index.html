@@ -1,67 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC Remote (MQTT)</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Universal AC Remote (MQTT)</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="remote">
-        <div class="status" id="status">Connecting to MQTT...</div>
-
-        <!-- Power Button (Toggle) -->
-        <button class="power-btn" id="powerBtn" onclick="togglePower()">
-            <span id="powerText">POWER</span>
-        </button>
-
-        <!-- Temperature Display -->
-        <div class="temp-display">
-            <span class="temp-value" id="tempValue">24</span>
-            <span class="temp-unit">°C</span>
-        </div>
-
-        <!-- Temperature Controls -->
-        <div class="temp-controls">
-            <button class="temp-btn" onclick="decreaseTemp()">−</button>
-            <button class="temp-btn" onclick="increaseTemp()">+</button>
-        </div>
-
-        <!-- Learning Mode Button -->
-        <button class="learning-btn" id="learningBtn" onclick="toggleLearning()">
-            📡 Learning Mode
-        </button>
-
-        <!-- Learning Panel -->
-        <div class="learning-panel" id="learningPanel">
-            <select id="learnCommand">
-                <option value="">Select command to learn</option>
-                <option value="POWER_ON">Power ON</option>
-                <option value="POWER_OFF">Power OFF</option>
-                <option value="TEMP_16">Temperature 16°C</option>
-                <option value="TEMP_17">Temperature 17°C</option>
-                <option value="TEMP_18">Temperature 18°C</option>
-                <option value="TEMP_19">Temperature 19°C</option>
-                <option value="TEMP_20">Temperature 20°C</option>
-                <option value="TEMP_21">Temperature 21°C</option>
-                <option value="TEMP_22">Temperature 22°C</option>
-                <option value="TEMP_23">Temperature 23°C</option>
-                <option value="TEMP_24">Temperature 24°C</option>
-                <option value="TEMP_25">Temperature 25°C</option>
-                <option value="TEMP_26">Temperature 26°C</option>
-                <option value="TEMP_27">Temperature 27°C</option>
-                <option value="TEMP_28">Temperature 28°C</option>
-                <option value="TEMP_29">Temperature 29°C</option>
-                <option value="TEMP_30">Temperature 30°C</option>
-            </select>
-            <button onclick="startLearning()">Start Learning</button>
-            <div class="learn-status" id="learnStatus"></div>
-        </div>
-
-        <!-- Toast Notifications -->
-        <div id="toast" class="toast"></div>
+  <div class="remote">
+    <!-- Header -->
+    <div class="header">
+      <h1>🌍 Universal AC Remote</h1>
+      <p>Control any AC from anywhere</p>
     </div>
 
-    <script type="module" src="script.js"></script>
+    <!-- Status -->
+    <div class="status" id="status">Connecting to MQTT...</div>
+
+    <!-- Control Section -->
+    <div class="control-section active" id="controlSection">
+      <!-- Power Button -->
+      <button class="power-btn" id="powerBtn" onclick="togglePower()">
+        <span id="powerText">POWER</span>
+      </button>
+
+      <!-- Temperature Display -->
+      <div class="temp-display">
+        <span class="temp-value" id="tempValue">24</span>
+        <span class="temp-unit">°C</span>
+      </div>
+
+      <!-- Temperature Controls -->
+      <div class="temp-controls">
+        <button class="temp-btn" onclick="decreaseTemp()">−</button>
+        <button class="temp-btn" onclick="increaseTemp()">+</button>
+      </div>
+
+      <!-- Learning Mode Button -->
+      <button class="learning-btn" id="learningBtn" onclick="toggleLearning()">
+        📡 Learning Mode
+      </button>
+
+      <!-- Learning Panel -->
+      <div class="learning-panel" id="learningPanel">
+        <select id="learnCommand">
+          <option value="">Select command to learn</option>
+          <option value="POWER_ON">Power ON</option>
+          <option value="POWER_OFF">Power OFF</option>
+          <option value="TEMP_16">Temperature 16°C</option>
+          <option value="TEMP_17">Temperature 17°C</option>
+          <option value="TEMP_18">Temperature 18°C</option>
+          <option value="TEMP_19">Temperature 19°C</option>
+          <option value="TEMP_20">Temperature 20°C</option>
+          <option value="TEMP_21">Temperature 21°C</option>
+          <option value="TEMP_22">Temperature 22°C</option>
+          <option value="TEMP_23">Temperature 23°C</option>
+          <option value="TEMP_24">Temperature 24°C</option>
+          <option value="TEMP_25">Temperature 25°C</option>
+          <option value="TEMP_26">Temperature 26°C</option>
+          <option value="TEMP_27">Temperature 27°C</option>
+          <option value="TEMP_28">Temperature 28°C</option>
+          <option value="TEMP_29">Temperature 29°C</option>
+          <option value="TEMP_30">Temperature 30°C</option>
+        </select>
+        <button onclick="startLearning()">Start Learning</button>
+        <div class="learn-status" id="learnStatus"></div>
+      </div>
+
+      <!-- Note: No "Change Connection" — MQTT is fixed -->
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script type="module" src="script.js"></script>
 </body>
 </html>
